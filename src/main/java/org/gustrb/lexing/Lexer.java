@@ -118,9 +118,6 @@ public class Lexer {
     }
 
     private Token getNumericLiteral() {
-        // TODO: Add support for exponents and floating point numbers
-        //       Im not doing it because it seems annoying and I don't feel
-        //       like it
         var tokenValue = "";
 
         while (this.isNumericLiteral() && this.currentIndex < this.contentToLex.length) {
@@ -145,8 +142,9 @@ public class Lexer {
     }
 
     private boolean isNumericLiteral() {
+        var sign = '-';
         var asciiValue = (int) this.currentCharacter;
-        return asciiValue >= 48 && asciiValue <= 57;
+        return (asciiValue >= 48 && asciiValue <= 57) || this.currentCharacter == sign;
     }
 
     public List<Token> collectTokens() {
