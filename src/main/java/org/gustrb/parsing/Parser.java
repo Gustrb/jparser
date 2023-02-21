@@ -4,23 +4,21 @@ import org.gustrb.lexing.Lexer;
 import org.gustrb.lexing.Token;
 import org.gustrb.lexing.TokenType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * TODO: Implement error handling on invalid jsons
- * TODO: Implement boolean literals
- * TODO: Implement null
+ * TODO: Implement string serialization
  * TODO: Refactor all of this mess
+ * TODO: Implement floating point numbers
  */
 public class Parser {
     private List<Token> tokens;
     private int currentIndex;
     private Token currentToken;
 
-
     public Parser(Lexer lexer) {
-         this.collectTokens(lexer);
+         this.tokens = lexer.collectTokens();
          this.currentIndex = -1;
          this.currentToken = null;
     }
@@ -36,14 +34,14 @@ public class Parser {
     }
 
     private JSONObject parseObject() {
-        JSONObject obj = new JSONObject();
+        var obj = new JSONObject();
 
         while (this.currentToken.getType() != TokenType.CLOSING_BRACKETS && this.currentToken.getType() != TokenType.EOF) {
-            String key = this.currentToken.getValue();
+            var key = this.currentToken.getValue();
             advanceCursor();
             advanceCursor();
 
-            JSONValue value = this.parseValue();
+            var value = this.parseValue();
             advanceCursor();
             obj.insert(key, value);
 
@@ -64,6 +62,14 @@ public class Parser {
             return JSONValue.createNumericLiteral(this.currentToken.getNumericalValue());
         }
 
+        if (this.currentToken.getType() == TokenType.BOOLEAN_LITERAL) {
+            return JSONValue.createBooleanLiteral(this.currentToken.getValue());
+        }
+
+        if (this.currentToken.getType() == TokenType.NULL_TOKEN) {
+            return JSONValue.createNull();
+        }
+
         if (this.currentToken.getType() == TokenType.OPEN_BRACKETS) {
             advanceCursor();
             var obj = JSONValue.createObject(this.parseObject());
@@ -82,7 +88,7 @@ public class Parser {
     }
 
     private JSONArray parseArray() {
-        JSONArray arr = new JSONArray();
+        var arr = new JSONArray();
 
         while (this.currentToken.getType() != TokenType.CLOSING_BRACES && this.currentToken.getType() != TokenType.EOF) {
             var val = this.parseValue();
@@ -107,16 +113,5 @@ public class Parser {
 
     private boolean isEmptyTokenList() {
         return this.tokens.get(0).getType() == TokenType.EOF;
-    }
-
-    private void collectTokens(Lexer lexer) {
-        List<Token> tokens = new ArrayList<>();
-        Token token = null;
-        do {
-            token = lexer.getNextToken();
-            tokens.add(token);
-        } while (token.getType() != TokenType.EOF);
-
-        this.tokens = tokens;
     }
 }

@@ -6,10 +6,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ParserTest {
+    private String AN_EMPTY_OBJECT = "{}";
+    private String AN_EMPTY_ARRAY = "[]";
     private String A_TOTALLY_VALID_JSON = "{ \n\t\"hello\": \"world\",\n\t\"val\":123456\n }";
     private String ANOTHER_TOTALLY_VALID_JSON = "[ \"hello\", \"world\" ]";
     private String AN_ARRAY_OF_OBJECTS = "[{ \n\t\"hello\": \"world\",\n\t\"val\":1\n }, { \n\t\"hello\": \"world\",\n\t\"val\":2\n }]";
     private String AN_OBJECT_THAT_HAS_AN_ARRAY = "{ \"stuff\": [ 12, 14 ] }";
+    private String AN_OBJECT_CONTAINING_NULL = "{ \"foo\": null, \"bar\": null }";
+    private String AN_OBJECT_CONTAINING_TRUE_AND_FALSE = "{ \"foo\": true, \"bar\": false }";
 
     @Test()
     public void smokeTest() {
@@ -24,11 +28,20 @@ class ParserTest {
 
     @Test()
     public void itShouldParseAnEmptyObject() {
-        var lexer = new Lexer("{}");
+        var lexer = new Lexer(AN_EMPTY_OBJECT);
         var parser = new Parser(lexer);
         var value = parser.parse();
 
         assertEquals(value.type, JSONValueType.OBJECT);
+    }
+
+    @Test()
+    public void itShouldParseAnEmptyArray() {
+        var lexer = new Lexer(AN_EMPTY_ARRAY);
+        var parser = new Parser(lexer);
+        var value = parser.parse();
+
+        assertEquals(value.type, JSONValueType.ARRAY);
     }
 
     @Test()
@@ -61,6 +74,35 @@ class ParserTest {
 
         assertEquals(arr.get(1).type, JSONValueType.STRING);
         assertEquals(arr.get(1).str, "world");
+    }
+
+    @Test()
+    public void itCanParseAnObjectContainingNull() {
+        var lexer = new Lexer(AN_OBJECT_CONTAINING_NULL);
+        var parser = new Parser(lexer);
+        var value = parser.parse();
+
+        assertEquals(value.type, JSONValueType.OBJECT);
+        var obj = value.obj;
+
+        assertEquals(obj.get("foo").type, JSONValueType.NULL);
+        assertEquals(obj.get("bar").type, JSONValueType.NULL);
+    }
+
+    @Test()
+    public void itCanParseAnObjectContainingTheBooleanLiterals() {
+        var lexer = new Lexer(AN_OBJECT_CONTAINING_TRUE_AND_FALSE);
+        var parser = new Parser(lexer);
+        var value = parser.parse();
+
+        assertEquals(value.type, JSONValueType.OBJECT);
+        var obj = value.obj;
+
+        assertEquals(obj.get("foo").type, JSONValueType.BOOLEAN);
+        assertEquals(obj.get("foo").bool, true);
+
+        assertEquals(obj.get("bar").type, JSONValueType.BOOLEAN);
+        assertEquals(obj.get("bar").bool, false);
     }
 
     @Test()

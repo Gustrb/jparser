@@ -8,6 +8,7 @@ public class JSONValue {
     public JSONObject obj;
     public JSONArray arr;
     public JSONValueType type;
+    public boolean bool;
 
     public static JSONValue createObject(JSONObject obj) {
         var val = new JSONValue();
@@ -38,6 +39,23 @@ public class JSONValue {
 
         value.type = JSONValueType.NUMBER;
         value.num = number;
+
+        return value;
+    }
+
+    public static JSONValue createNull() {
+        var value = new JSONValue();
+
+        value.type = JSONValueType.NULL;
+
+        return value;
+    }
+
+    public static JSONValue createBooleanLiteral(String strRepresentation) {
+        var value = new JSONValue();
+
+        value.type = JSONValueType.BOOLEAN;
+        value.bool = Boolean.valueOf(strRepresentation);
 
         return value;
     }

@@ -4,5 +4,5 @@ public enum JSONValueType {
     STRING,
     NUMBER,
     OBJECT,
-    ARRAY
+    NULL, BOOLEAN, ARRAY
 }

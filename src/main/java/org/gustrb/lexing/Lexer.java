@@ -1,5 +1,8 @@
 package org.gustrb.lexing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Lexer {
     private char[] contentToLex;
     private int currentIndex;
@@ -52,6 +55,14 @@ public class Lexer {
                 return this.getStringLiteralToken();
             }
 
+            if (this.currentCharacter == 'n') {
+                return this.getNullToken();
+            }
+
+            if (this.currentCharacter == 't' || this.currentCharacter == 'f') {
+                return this.getBooleanLiteral();
+            }
+
             if (this.isNumericLiteral()) {
                return this.getNumericLiteral();
             }
@@ -60,6 +71,37 @@ public class Lexer {
         }
 
         return new Token(TokenType.EOF);
+    }
+
+    private Token getBooleanLiteral() {
+        var literal = this.advanceTo(this.currentIndex + 4);
+        if (literal.equals("true")) {
+            return new Token(TokenType.BOOLEAN_LITERAL, "true");
+        }
+
+        literal += this.advanceTo(this.currentIndex + 1);
+        if (literal.equals("false")) {
+            return new Token(TokenType.BOOLEAN_LITERAL, "false");
+        }
+
+        return null;
+    }
+
+    private Token getNullToken() {
+        var literal = this.advanceTo(this.currentIndex + 4);
+        if (literal.equals("null")) {
+            return new Token(TokenType.NULL_TOKEN);
+        }
+        return null;
+    }
+
+    private String advanceTo(int end) {
+        var content = "";
+        for (var i = this.currentIndex; i < end; i++) {
+            content += this.currentCharacter;
+            this.advanceCursor();
+        }
+        return content;
     }
 
     private Token getStringLiteralToken() {
@@ -105,5 +147,16 @@ public class Lexer {
     private boolean isNumericLiteral() {
         var asciiValue = (int) this.currentCharacter;
         return asciiValue >= 48 && asciiValue <= 57;
+    }
+
+    public List<Token> collectTokens() {
+        List<Token> tokens = new ArrayList<>();
+        Token token = null;
+        do {
+            token = this.getNextToken();
+            tokens.add(token);
+        } while (token.getType() != TokenType.EOF);
+
+        return tokens;
     }
 }

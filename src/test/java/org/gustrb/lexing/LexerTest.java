@@ -2,7 +2,6 @@ package org.gustrb.lexing;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,6 +10,8 @@ class LexerTest {
     private String EMPTY_CONTENT = "";
     private String A_SHITLOAD_OF_EMPTY_SPACE = " \n\t ";
     private String A_TOTALLY_VALID_JSON = "{ \n\t\"hello\": \"world\",\n\t\"val\":123456\n }";
+    private String A_NULL_VALUE = "null";
+    private String THE_BOOLEAN_LITERALS = "true false";
 
     @Test()
     public void smokeTest() {
@@ -55,7 +56,7 @@ class LexerTest {
                 TokenType.EOF
         };
         var lexer = new Lexer(MORE_THAN_ONE_TOKEN);
-        var tokens = collectTokensFromLexer(lexer);
+        var tokens = lexer.collectTokens();
 
         for (int i = 0; i < expectedTokens.length; i++) {
             assertEquals(expectedTokens[i], tokens.get(i).getType());
@@ -65,7 +66,7 @@ class LexerTest {
     @Test()
     public void itShouldReturnOnlyEofWhenLexingWhitespaces() {
         var lexer = new Lexer(A_SHITLOAD_OF_EMPTY_SPACE);
-        var tokens = collectTokensFromLexer(lexer);
+        var tokens = lexer.collectTokens();
 
         assertEquals(tokens.size(), 1);
         assertEquals(tokens.get(0).getType(), TokenType.EOF);
@@ -75,7 +76,7 @@ class LexerTest {
     public void itShouldBeAbleToLexAStringLiteral() {
         var STRING_LITERAL = "\"Hello, world!\"";
         var lexer = new Lexer(STRING_LITERAL);
-        var tokens = collectTokensFromLexer(lexer);
+        var tokens = lexer.collectTokens();
 
         assertEquals(tokens.size(), 2);
         var token = tokens.get(0);
@@ -87,7 +88,7 @@ class LexerTest {
     public void itShouldBeAbleToLexANumericLiteral() {
         var NUMERIC_LITERAL = "1234567890";
         var lexer = new Lexer(NUMERIC_LITERAL);
-        var tokens = collectTokensFromLexer(lexer);
+        var tokens = lexer.collectTokens();
 
         assertEquals(tokens.size(), 2);
         var token = tokens.get(0);
@@ -117,24 +118,38 @@ class LexerTest {
                 new Token(TokenType.CLOSING_BRACKETS),
                 new Token(TokenType.EOF)
         );
-        var got = collectTokensFromLexer(lexer);
+        var got = lexer.collectTokens();
         expectTokensEquality(expectedTokens, got);
     }
 
-    private List<Token> collectTokensFromLexer(Lexer lexer) {
-        List<Token> tokens = new ArrayList<>();
-        Token token = null;
-        do {
-            token = lexer.getNextToken();
-            tokens.add(token);
-        } while (token.getType() != TokenType.EOF);
+    @Test()
+    public void itCanLexTheNullToken() {
+        var lexer = new Lexer(A_NULL_VALUE);
+        var expectedTokens = List.of(
+                new Token(TokenType.NULL_TOKEN),
+                new Token(TokenType.EOF)
+        );
+        var got = lexer.collectTokens();
 
-        return tokens;
+        expectTokensEquality(expectedTokens, got);
+    }
+
+    @Test()
+    public void itCanLexTheBooleanLiterals() {
+        var lexer = new Lexer(THE_BOOLEAN_LITERALS);
+        var expectedTokens = List.of(
+                new Token(TokenType.BOOLEAN_LITERAL, "true"),
+                new Token(TokenType.BOOLEAN_LITERAL, "false"),
+                new Token(TokenType.EOF)
+        );
+        var got = lexer.collectTokens();
+
+        expectTokensEquality(expectedTokens, got);
     }
 
     private void expectTokensEquality(List<Token> expected, List<Token> got) {
         assertEquals(expected.size(), got.size());
-        for (int i = 0; i < expected.size(); i++) {
+        for (var i = 0; i < expected.size(); i++) {
             var expectedToken = expected.get(i);
             var gotToken = got.get(i);
 
