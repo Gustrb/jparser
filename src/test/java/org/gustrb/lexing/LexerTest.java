@@ -12,6 +12,7 @@ class LexerTest {
     private String A_TOTALLY_VALID_JSON = "{ \n\t\"hello\": \"world\",\n\t\"val\":123456\n }";
     private String A_NULL_VALUE = "null";
     private String THE_BOOLEAN_LITERALS = "true false";
+    private String SOME_NUMBERS = "-100 100 -4";
 
     @Test()
     public void smokeTest() {
@@ -82,6 +83,19 @@ class LexerTest {
         var token = tokens.get(0);
         assertEquals(token.getType(), TokenType.STRING_LITERAL);
         assertEquals(token.getValue(), "Hello, world!");
+    }
+
+    @Test()
+    public void itShouldBeAbleToLexIntegers() {
+        var lexer = new Lexer(SOME_NUMBERS);
+        var tokens = lexer.collectTokens();
+        var numbers = new int[]{-100, 100, -4};
+        assertEquals(tokens.size(), 4);
+        for (var i = 0; i < 3; i++) {
+            var token = tokens.get(i);
+            assertEquals(token.getType(), TokenType.NUMERIC_LITERAL);
+            assertEquals(token.getNumericalValue(), numbers[i]);
+        }
     }
 
     @Test()

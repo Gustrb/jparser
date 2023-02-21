@@ -12,6 +12,7 @@ class ParserTest {
     private String ANOTHER_TOTALLY_VALID_JSON = "[ \"hello\", \"world\" ]";
     private String AN_ARRAY_OF_OBJECTS = "[{ \n\t\"hello\": \"world\",\n\t\"val\":1\n }, { \n\t\"hello\": \"world\",\n\t\"val\":2\n }]";
     private String AN_OBJECT_THAT_HAS_AN_ARRAY = "{ \"stuff\": [ 12, 14 ] }";
+    private String AN_ARRAY_WITH_NEGATIVE_NUMBERS = "[ -12, 3, -10 ]";
     private String AN_OBJECT_CONTAINING_NULL = "{ \"foo\": null, \"bar\": null }";
     private String AN_OBJECT_CONTAINING_TRUE_AND_FALSE = "{ \"foo\": true, \"bar\": false }";
 
@@ -74,6 +75,25 @@ class ParserTest {
 
         assertEquals(arr.get(1).type, JSONValueType.STRING);
         assertEquals(arr.get(1).str, "world");
+    }
+
+    @Test()
+    public void itShouldParseAnArrayWithNegativeNumbers() {
+        var lexer = new Lexer(AN_ARRAY_WITH_NEGATIVE_NUMBERS);
+        var parser = new Parser(lexer);
+        var value = parser.parse();
+
+        assertEquals(value.type, JSONValueType.ARRAY);
+        var arr = value.arr;
+
+        assertEquals(arr.get(0).type, JSONValueType.NUMBER);
+        assertEquals(arr.get(0).num, -12);
+
+        assertEquals(arr.get(1).type, JSONValueType.NUMBER);
+        assertEquals(arr.get(1).num, 3);
+
+        assertEquals(arr.get(2).type, JSONValueType.NUMBER);
+        assertEquals(arr.get(2).num, -10);
     }
 
     @Test()
