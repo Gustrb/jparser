@@ -5,6 +5,7 @@ public class JSONValue {
 
     public String str;
     public int num;
+    public float asFloat;
     public JSONObject obj;
     public JSONArray arr;
     public JSONValueType type;
@@ -39,6 +40,15 @@ public class JSONValue {
 
         value.type = JSONValueType.NUMBER;
         value.num = number;
+
+        return value;
+    }
+
+    public static JSONValue createFloatingPointLiteral(float number) {
+        var value = new JSONValue();
+
+        value.type = JSONValueType.FLOAT;
+        value.asFloat = number;
 
         return value;
     }
