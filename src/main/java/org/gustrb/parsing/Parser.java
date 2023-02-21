@@ -10,7 +10,6 @@ import java.util.List;
  * TODO: Implement error handling on invalid jsons
  * TODO: Implement string serialization
  * TODO: Refactor all of this mess
- * TODO: Implement floating point numbers
  */
 public class Parser {
     private List<Token> tokens;
@@ -60,6 +59,10 @@ public class Parser {
 
         if (this.currentToken.getType() == TokenType.NUMERIC_LITERAL) {
             return JSONValue.createNumericLiteral(this.currentToken.getNumericalValue());
+        }
+
+        if (this.currentToken.getType() == TokenType.FLOATING_POINT_LITERAL) {
+            return JSONValue.createFloatingPointLiteral(this.currentToken.getFloatingPointValue());
         }
 
         if (this.currentToken.getType() == TokenType.BOOLEAN_LITERAL) {

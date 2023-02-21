@@ -15,6 +15,8 @@ class ParserTest {
     private String AN_ARRAY_WITH_NEGATIVE_NUMBERS = "[ -12, 3, -10 ]";
     private String AN_OBJECT_CONTAINING_NULL = "{ \"foo\": null, \"bar\": null }";
     private String AN_OBJECT_CONTAINING_TRUE_AND_FALSE = "{ \"foo\": true, \"bar\": false }";
+    private String A_SIMPLE_FLOAT_ARRAY =  "[ 4.5, -1e10, 100 ]";
+    private String A_FLOAT_OBJECT = "{ \"foo\": 4.125, \"bar\": 1.2 }";
 
     @Test()
     public void smokeTest() {
@@ -160,5 +162,29 @@ class ParserTest {
 
         assertEquals(arr.get(0).num, 12);
         assertEquals(arr.get(1).num, 14);
+    }
+
+    @Test()
+    public void itCanParseAnArrayOfFloats() {
+        var lexer = new Lexer(A_SIMPLE_FLOAT_ARRAY);
+        var parser = new Parser(lexer);
+        var value = parser.parse();
+
+        var arr = value.arr;
+        assertEquals(4.5f, arr.get(0).asFloat);
+        assertEquals(-1e10f, arr.get(1).asFloat);
+        assertEquals(100, arr.get(2).num);
+    }
+
+    @Test()
+    public void itCanParseAnObjectContainingFloats() {
+        var lexer = new Lexer(A_FLOAT_OBJECT);
+        var parser = new Parser(lexer);
+        var value = parser.parse();
+
+        var obj = value.obj;
+
+        assertEquals(4.125f, obj.get("foo").asFloat);
+        assertEquals(1.2f, obj.get("bar").asFloat);
     }
 }

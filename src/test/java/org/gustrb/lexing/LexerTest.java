@@ -13,6 +13,9 @@ class LexerTest {
     private String A_NULL_VALUE = "null";
     private String THE_BOOLEAN_LITERALS = "true false";
     private String SOME_NUMBERS = "-100 100 -4";
+    private String A_FLOATING_POINT_NUMBER = "10e4";
+
+    private String FLOATING_POINT_NUMBERS = "10e2 10.2 100 -14.2";
 
     @Test()
     public void smokeTest() {
@@ -109,6 +112,31 @@ class LexerTest {
 
         assertEquals(token.getType(), TokenType.NUMERIC_LITERAL);
         assertEquals(token.getNumericalValue(), 1234567890);
+    }
+
+    @Test()
+    public void itShouldBeAbleToLexAFloat() {
+        var lexer = new Lexer(A_FLOATING_POINT_NUMBER);
+        var tokens = lexer.collectTokens();
+
+        assertEquals(2, tokens.size());
+        var token = tokens.get(0);
+
+        assertEquals(token.getType(), TokenType.FLOATING_POINT_LITERAL);
+        assertEquals(token.getFloatingPointValue(), 10e4f);
+    }
+
+    @Test()
+    public void itShouldBeAbleToLexAllTheTypesOfNumbers() {
+        var lexer = new Lexer(FLOATING_POINT_NUMBERS);
+        var tokens = lexer.collectTokens();
+
+        assertEquals(5, tokens.size());
+
+        assertEquals(tokens.get(0).getFloatingPointValue(), 10e2f);
+        assertEquals(tokens.get(1).getFloatingPointValue(), 10.2f);
+        assertEquals(tokens.get(2).getNumericalValue(), 100);
+        assertEquals(tokens.get(3).getFloatingPointValue(), -14.2f);
     }
 
     @Test()

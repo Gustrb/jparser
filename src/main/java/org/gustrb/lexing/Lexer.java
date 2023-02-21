@@ -123,9 +123,24 @@ public class Lexer {
         while (this.isNumericLiteral() && this.currentIndex < this.contentToLex.length) {
             tokenValue += this.currentCharacter;
             this.advanceCursor();
+
+            if (this.currentCharacter == '.' || this.currentCharacter == 'e') {
+                return this.getFloatingPointLiteral(tokenValue);
+            }
         }
 
         return new Token(TokenType.NUMERIC_LITERAL, tokenValue);
+    }
+
+    private Token getFloatingPointLiteral(String partialValue) {
+        partialValue += this.currentCharacter;
+        advanceCursor();
+        while (this.isNumericLiteral() && this.currentIndex < this.contentToLex.length) {
+            partialValue += this.currentCharacter;
+            advanceCursor();
+        }
+
+        return new Token(TokenType.FLOATING_POINT_LITERAL, partialValue);
     }
 
     private void advanceCursor() {
@@ -142,6 +157,9 @@ public class Lexer {
     }
 
     private boolean isNumericLiteral() {
+        // TODO: A number can only contain a - in the beginning
+        //       if it is located in the middle of it then an error should be
+        //       thrown
         var sign = '-';
         var asciiValue = (int) this.currentCharacter;
         return (asciiValue >= 48 && asciiValue <= 57) || this.currentCharacter == sign;
@@ -149,7 +167,7 @@ public class Lexer {
 
     public List<Token> collectTokens() {
         List<Token> tokens = new ArrayList<>();
-        Token token = null;
+        Token token;
         do {
             token = this.getNextToken();
             tokens.add(token);

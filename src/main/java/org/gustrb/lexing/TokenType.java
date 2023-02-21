@@ -8,6 +8,7 @@ public enum TokenType {
     CLOSING_BRACES,
     STRING_LITERAL,
     NUMERIC_LITERAL,
+    FLOATING_POINT_LITERAL,
     SEMI_COLON,
     COMMA,
     NULL_TOKEN,

@@ -24,4 +24,8 @@ public class Token {
     public int getNumericalValue() {
        return Integer.parseInt(this.value);
     }
+
+    public float getFloatingPointValue() {
+        return Float.parseFloat(this.value);
+    }
 }
